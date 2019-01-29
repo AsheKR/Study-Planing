@@ -36,3 +36,16 @@ class TestUserModel:
             User.objects.create_user(
                 **dict(second_user_info),
             )
+
+    def test_user_email_must_be_uinque(self):
+        first_user_info = (('user_id', 'id1'), ('password', 'asd'), ('email', 'same@same.com'),)
+        second_user_info = (('user_id', 'id2'), ('password', 'asd'), ('email', 'same@same.com'),)
+
+        with pytest.raises(IntegrityError):
+            User.objects.create_user(
+                **dict(first_user_info),
+            )
+
+            User.objects.create_user(
+                **dict(second_user_info),
+            )
