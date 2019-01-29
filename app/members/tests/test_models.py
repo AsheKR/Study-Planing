@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 
 User = get_user_model()
 
@@ -22,3 +23,16 @@ class TestUserModel:
         )
 
         assert user == User.objects.first(), 'User Create Failed'
+
+    def test_user_id_must_be_unique(self):
+        first_user_info = (('user_id', 'same_user_id'), ('password', 'asd'), ('email', 'a@a.com'),)
+        second_user_info = (('user_id', 'same_user_id'), ('password', 'asd'), ('email', 'b@b.com'),)
+
+        with pytest.raises(IntegrityError):
+            User.objects.create_user(
+                **dict(first_user_info),
+            )
+
+            User.objects.create_user(
+                **dict(second_user_info),
+            )
