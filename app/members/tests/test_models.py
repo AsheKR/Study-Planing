@@ -49,3 +49,13 @@ class TestUserModel:
             User.objects.create_user(
                 **dict(second_user_info),
             )
+
+    def test_create_superuser(self):
+        admin_user_info = (('user_id', 'admin'), ('password', 'asd'), ('email', 'admin@admin.com'),)
+
+        admin = User.objects.create_superuser(
+            **dict(admin_user_info)
+        )
+
+        assert admin == User.objects.get(is_superuser=True)
+        assert admin.is_superuser is True
