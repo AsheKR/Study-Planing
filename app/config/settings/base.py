@@ -26,9 +26,13 @@ SECRET_DIR = os.path.join(ROOT_DIR, '.secrets')
 
 STATIC_URL = '/static/'
 
+AUTH_USER_MODEL = 'members.User'
+
 # Application definition
 
 INSTALLED_APPS = [
+    'members',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
