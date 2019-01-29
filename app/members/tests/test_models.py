@@ -5,7 +5,7 @@ from django.db import IntegrityError
 User = get_user_model()
 
 
-class TestUserModel:
+class TestCreateUserModel:
 
     def test_fields_that_must_be_filled_in_when_creating_user(self):
         user_info = (('user_id', 'example1'), ('password', 'asd'), ('email', 'a@a.com'), )
