@@ -14,3 +14,20 @@ class TestRepositoryModel:
             Repository.objects.create(
                 name='First_Repo',
             )
+
+    def test_cannot_create_repository_by_same_user_using_same_repo_name(self):
+        user = User.objects.create_user(
+            user_id='example1',
+            password='123',
+            email='a@a.com'
+        )
+
+        with pytest.raises(IntegrityError):
+            Repository.objects.create(
+                name='same_name',
+                owner=user
+            )
+            Repository.objects.create(
+                name='same_name',
+                owner=user
+            )
