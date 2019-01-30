@@ -35,6 +35,20 @@ class TestRepositoryModel:
                 owner=user
             )
 
+    def test_get_repository_dir_has_correct_path(self):
+        user = User.objects.create_user(
+            user_id='example1',
+            password='123',
+            email='a@a.com'
+        )
+
+        repo = Repository.objects.create(
+            name='repo',
+            owner=user
+        )
+
+        assert 'example1/repo' in repo.get_repository_dir
+
 
 class TestManagedFileModel:
     def _create_stub_user_and_repository(self):

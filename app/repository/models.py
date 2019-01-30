@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.db import models
 
@@ -18,6 +20,10 @@ class Repository(models.Model):
             'name',
             'owner',
         )
+
+    @property
+    def get_repository_dir(self):
+        return os.path.join(settings.ROOT_DIR, '.media', self.owner.user_id, self.name)
 
 
 class ManagedFile(models.Model):
