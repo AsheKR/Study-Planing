@@ -28,11 +28,11 @@ class TestRepositoryModel:
 
         with pytest.raises(IntegrityError):
             Repository.objects.create(
-                name='same_name',
+                name='same_repo_name',
                 owner=user
             )
             Repository.objects.create(
-                name='same_name',
+                name='same_repo_name',
                 owner=user
             )
 
