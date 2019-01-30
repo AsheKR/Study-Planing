@@ -21,3 +21,7 @@ ALLOWED_HOSTS = [
 DATABASES = DEV_JSON['DATABASES']
 
 WSGI_APPLICATION = 'config.wsgi.dev.application'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(ROOT_DIR, '.media')
