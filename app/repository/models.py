@@ -35,3 +35,16 @@ class ManagedFile(models.Model):
         upload_to=upload_dynamic_path,
         storage=ManagedFileSystemStorage()
     )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        TrackedFileInfo.objects.create(
+            managed_file=self,
+        )
+
+
+class TrackedFileInfo(models.Model):
+    managed_file = models.ForeignKey(
+        ManagedFile,
+        on_delete=models.CASCADE,
+    )

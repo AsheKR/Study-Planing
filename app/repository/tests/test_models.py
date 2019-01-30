@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.db import IntegrityError
 
-from repository.models import Repository, ManagedFile
+from repository.models import Repository, ManagedFile, TrackedFileInfo
 
 User = get_user_model()
 
@@ -70,3 +70,12 @@ class TestManagedFileModel:
         )
         obj.file.save('file_name', myfile)
         assert '/user/repo/file_name' in obj.file.path
+
+    def test_create_file_also_create_a_commit(self):
+        self._create_stub_user_and_repository()
+        myfile = ContentFile(random.choice('abcde'))
+        obj = ManagedFile(
+            repository=self.repo,
+        )
+        obj.file.save('file_name', myfile)
+        assert TrackedFileInfo.objects.count() == 1
