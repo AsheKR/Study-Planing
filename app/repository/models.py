@@ -1,4 +1,5 @@
 import os
+import pathlib
 
 from django.conf import settings
 from django.db import models
@@ -24,6 +25,10 @@ class Repository(models.Model):
     @property
     def get_repository_dir(self):
         return os.path.join(settings.ROOT_DIR, '.media', self.owner.user_id, self.name)
+
+    def save(self, *args, **kwargs):
+        super().save()
+        pathlib.Path(os.path.join(self.get_repository_dir, '.vcs')).mkdir(parents=True, exist_ok=True)
 
 
 class ManagedFile(models.Model):

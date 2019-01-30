@@ -1,3 +1,4 @@
+import os
 import random
 
 import pytest
@@ -48,6 +49,20 @@ class TestRepositoryModel:
         )
 
         assert 'example1/repo' in repo.get_repository_dir
+
+    def test_create_repository_also_create_vcs_dir(self):
+        user = User.objects.create_user(
+            user_id='example1',
+            password='123',
+            email='a@a.com'
+        )
+
+        repo = Repository.objects.create(
+            name='repo',
+            owner=user
+        )
+
+        assert os.path.isdir(os.path.join(repo.get_repository_dir, '.vcs')) is True
 
 
 class TestManagedFileModel:
