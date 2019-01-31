@@ -15,6 +15,10 @@ class Repository(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
+    root_folder = models.OneToOneField(
+        'ManagedFile',
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         unique_together = (
@@ -27,25 +31,36 @@ class Repository(models.Model):
         return os.path.join(settings.ROOT_DIR, '.media', self.owner.user_id, self.name)
 
     def save(self, *args, **kwargs):
+        root_folder = ManagedFile.objects.create(
+            name='/',
+        )
+        self.root_folder = root_folder
         super().save()
         pathlib.Path(os.path.join(self.get_repository_dir, '.vcs')).mkdir(parents=True, exist_ok=True)
 
 
 class ManagedFile(models.Model):
-    repository = models.ForeignKey(
-        Repository,
-        on_delete=models.CASCADE,
+    name = models.CharField(
+        max_length=20,
     )
     file = models.FileField(
         upload_to=upload_dynamic_path,
-        storage=ManagedFileSystemStorage()
+        storage=ManagedFileSystemStorage(),
+        blank=True,
+        null=True,
+    )
+    dir = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        blank=True,
     )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        TrackedFileInfo.objects.create(
-            managed_file=self,
-        )
+        if self.file:
+            TrackedFileInfo.objects.create(
+                managed_file=self,
+            )
 
 
 class TrackedFileInfo(models.Model):

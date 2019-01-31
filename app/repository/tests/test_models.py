@@ -64,6 +64,20 @@ class TestRepositoryModel:
 
         assert os.path.isdir(os.path.join(repo.get_repository_dir, '.vcs')) is True
 
+    def test_create_repository_also_create_root_managed_folder(self):
+        user = User.objects.create_user(
+            user_id='example1',
+            password='123',
+            email='a@a.com'
+        )
+
+        repo = Repository.objects.create(
+            name='repo',
+            owner=user
+        )
+
+        assert repo.root_folder == ManagedFile.objects.first()
+
 
 class TestManagedFileModel:
     def _create_stub_user_and_repository(self):
