@@ -146,3 +146,21 @@ class TestManagedFileModel:
         )
         obj.file.save('file_name', myfile)
         assert obj.file_hash == hashlib.sha1(str.encode('/file_name')).hexdigest()
+
+    def test_recursive_directory_file_has_correct_parent_dir(self):
+        self._create_stub_user_and_repository()
+        first_folder = ManagedFile.objects.create(
+            name='first_folder',
+            dir=self.repo.root_folder,
+        )
+        second_folder = ManagedFile.objects.create(
+            name='second_folder',
+            dir=first_folder,
+        )
+        myfile = ContentFile(random.choice('abcde'))
+        obj = ManagedFile(
+            name='file_name',
+            dir=second_folder,
+        )
+        obj.file.save('file_name', myfile)
+        assert '/user/repo/first_folder/second_folder/file_name' in obj.file.path

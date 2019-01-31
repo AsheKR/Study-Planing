@@ -5,13 +5,17 @@ from django.core.files.storage import FileSystemStorage
 
 def upload_dynamic_path(instance, filename):
     root_dir = instance.get_root_dir(instance)
+    parent_dir = instance.get_parent_dir(instance)
     repository = root_dir.root_repository
 
-    return '{0}/{1}/{2}'.format(
+    value = '{0}/{1}/{2}/{3}'.format(
         repository.owner,
         repository.name,
+        parent_dir,
         filename,
     )
+
+    return value
 
 
 class ManagedFileSystemStorage(FileSystemStorage):

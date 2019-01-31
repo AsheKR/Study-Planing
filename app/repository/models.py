@@ -75,10 +75,16 @@ class ManagedFile(models.Model):
         if not parent_dir.dir:
             return ''
 
-        return parent_dir.dir.name + self.get_parent_dir(parent_dir.dir)
+        if parent_dir.dir.name == '/':
+            name = ''
+        else:
+            name = parent_dir.dir.name
+
+        return self.get_parent_dir(parent_dir.dir) + '/' + name
 
     def save(self, *args, **kwargs):
         dir_full_path = self.get_parent_dir(self) + self.name
+        print(dir_full_path)
         file_hash = hashlib.sha1(str.encode(dir_full_path)).hexdigest()
 
         self.file_hash = file_hash
