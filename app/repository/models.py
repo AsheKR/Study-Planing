@@ -72,14 +72,13 @@ class ManagedFile(models.Model):
         return self.get_root_dir(parent_dir.dir)
 
     def get_parent_dir(self, parent_dir):
-        if not parent_dir:
+        if not parent_dir.dir:
             return ''
 
-        return parent_dir.name + self.get_parent_dir(parent_dir.dir)
+        return parent_dir.dir.name + self.get_parent_dir(parent_dir.dir)
 
     def save(self, *args, **kwargs):
-        dir_full_path = self.get_parent_dir(self.dir) + self.name
-        print(dir_full_path)
+        dir_full_path = self.get_parent_dir(self) + self.name
         file_hash = hashlib.sha1(str.encode(dir_full_path)).hexdigest()
 
         self.file_hash = file_hash
@@ -90,7 +89,6 @@ class ManagedFile(models.Model):
             TrackedFileInfo.objects.create(
                 managed_file=self,
             )
-
 
 
 class TrackedFileInfo(models.Model):

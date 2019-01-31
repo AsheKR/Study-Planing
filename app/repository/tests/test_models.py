@@ -120,7 +120,22 @@ class TestManagedFileModel:
             dir=self.repo.root_folder
         )
 
-        assert myfolder.get_parent_dir(myfolder.dir) + myfolder.name == '/child_folder'
+        assert myfolder.get_parent_dir(myfolder) + myfolder.name == '/child_folder'
+
+    def test_get_root_dir_object(self):
+        self._create_stub_user_and_repository()
+        myfolder = ManagedFile.objects.create(
+            name='child_folder',
+            dir=self.repo.root_folder
+        )
+        file = ContentFile(random.choice('abcde'))
+        myfile = ManagedFile.objects.create(
+            name='child_file',
+            dir=self.repo.root_folder,
+        )
+        myfile.file.save('child_file', file)
+        assert myfile.get_root_dir(myfile) == self.repo.root_folder
+        assert myfolder.get_root_dir(myfolder) == self.repo.root_folder
 
     def test_has_a_hash_value_for_the_file_name(self):
         self._create_stub_user_and_repository()
