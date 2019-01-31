@@ -4,6 +4,7 @@ import pathlib
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from repository.filesystems import upload_dynamic_path, ManagedFileSystemStorage
 
@@ -36,6 +37,7 @@ class Repository(models.Model):
     def save(self, *args, **kwargs):
         root_folder = ManagedFile.objects.create(
             name='/',
+            create_author=self.owner,
         )
         self.root_folder = root_folder
         super().save()
@@ -43,6 +45,10 @@ class Repository(models.Model):
 
 
 class ManagedFile(models.Model):
+    create_author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
     name = models.CharField(
         max_length=20,
     )
@@ -84,7 +90,6 @@ class ManagedFile(models.Model):
 
     def save(self, *args, **kwargs):
         dir_full_path = self.get_parent_dir(self) + self.name
-        print(dir_full_path)
         file_hash = hashlib.sha1(str.encode(dir_full_path)).hexdigest()
 
         self.file_hash = file_hash
@@ -92,13 +97,51 @@ class ManagedFile(models.Model):
         super().save(*args, **kwargs)
 
         if self.file:
-            TrackedFileInfo.objects.create(
+            track = TrackedFileInfo.objects.create(
                 managed_file=self,
+            )
+            Commit.objects.create(
+                tracked_file=track,
+                author=self.create_author,
+                title=self.name+'생성됨.',
             )
 
 
 class TrackedFileInfo(models.Model):
-    managed_file = models.ForeignKey(
+    managed_file = models.OneToOneField(
         ManagedFile,
         on_delete=models.CASCADE,
     )
+    # head는 file_content_hash 내용을 가진다.
+    head = models.CharField(
+        max_length=40,
+    )
+
+
+class Commit(models.Model):
+    tracked_file = models.ForeignKey(
+        TrackedFileInfo,
+        on_delete=models.CASCADE,
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    title = models.CharField(
+        max_length=50,
+    )
+    content = models.TextField(
+        blank=True,
+        null=True,
+    )
+    commit_hash = models.CharField(
+        max_length=40,
+    )
+    created_at = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        now = timezone.now()
+        full_str = self.tracked_file.managed_file.name + str(now)
+        self.commit_hash = hashlib.sha1(str.encode(full_str)).hexdigest()
+        self.created_at = now
+        super().save(*args, **kwargs)

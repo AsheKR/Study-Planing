@@ -5,7 +5,7 @@ import random
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-from django.db import IntegrityError
+from django.db import IntegrityError, models
 
 from repository.models import Repository, ManagedFile, TrackedFileInfo
 
@@ -15,7 +15,7 @@ User = get_user_model()
 class TestRepositoryModel:
 
     def test_cannot_create_repository_by_none_user(self):
-        with pytest.raises(IntegrityError):
+        with pytest.raises(models.ObjectDoesNotExist):
             Repository.objects.create(
                 name='First_Repo',
             )
@@ -97,6 +97,7 @@ class TestManagedFileModel:
         self._create_stub_user_and_repository()
         myfile = ContentFile(random.choice('abcde'))
         obj = ManagedFile(
+            create_author=self.user,
             name='file_name',
             dir=self.repo.root_folder,
         )
@@ -107,6 +108,7 @@ class TestManagedFileModel:
         self._create_stub_user_and_repository()
         myfile = ContentFile(random.choice('abcde'))
         obj = ManagedFile(
+            create_author=self.user,
             name='file_name',
             dir = self.repo.root_folder,
         )
@@ -116,6 +118,7 @@ class TestManagedFileModel:
     def test_dir_has_full_dir_path(self):
         self._create_stub_user_and_repository()
         myfolder = ManagedFile.objects.create(
+            create_author=self.user,
             name='child_folder',
             dir=self.repo.root_folder
         )
@@ -125,11 +128,13 @@ class TestManagedFileModel:
     def test_get_root_dir_object(self):
         self._create_stub_user_and_repository()
         myfolder = ManagedFile.objects.create(
+            create_author=self.user,
             name='child_folder',
             dir=self.repo.root_folder
         )
         file = ContentFile(random.choice('abcde'))
         myfile = ManagedFile.objects.create(
+            create_author=self.user,
             name='child_file',
             dir=self.repo.root_folder,
         )
@@ -141,6 +146,7 @@ class TestManagedFileModel:
         self._create_stub_user_and_repository()
         myfile = ContentFile(random.choice('abcde'))
         obj = ManagedFile(
+            create_author=self.user,
             name='file_name',
             dir=self.repo.root_folder,
         )
@@ -150,17 +156,53 @@ class TestManagedFileModel:
     def test_recursive_directory_file_has_correct_parent_dir(self):
         self._create_stub_user_and_repository()
         first_folder = ManagedFile.objects.create(
+            create_author=self.user,
             name='first_folder',
             dir=self.repo.root_folder,
         )
         second_folder = ManagedFile.objects.create(
+            create_author=self.user,
             name='second_folder',
             dir=first_folder,
         )
         myfile = ContentFile(random.choice('abcde'))
         obj = ManagedFile(
+            create_author=self.user,
             name='file_name',
             dir=second_folder,
         )
         obj.file.save('file_name', myfile)
         assert '/user/repo/first_folder/second_folder/file_name' in obj.file.path
+
+    def test_managed_file_also_create_commit_message_with_commit_hash(self):
+        self._create_stub_user_and_repository()
+        myfile = ContentFile(random.choice('abcde'))
+        obj = ManagedFile(
+            create_author=self.user,
+            name='file_name',
+            dir=self.repo.root_folder,
+        )
+        obj.file.save('file_name', myfile)
+        assert obj.trackedfileinfo.commit_set.count() == 1
+        assert obj.trackedfileinfo.commit_set.first().commit_hash
+
+
+
+class TestTrackedFileInfoModel:
+
+    def _create_stub_user_and_repository_and_file(self):
+        self.user = User.objects.create_user(
+            user_id='user',
+            password='123',
+            email='a@a.com'
+        )
+        self.repo = Repository.objects.create(
+            name='repo',
+            owner=self.user
+        )
+        file = ContentFile(random.choice('abcde'))
+        self.file = ManagedFile(
+            name='file_name',
+            dir=self.repo.root_folder,
+        )
+        self.file.file.save('file_name', file)
