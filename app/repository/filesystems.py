@@ -4,9 +4,12 @@ from django.core.files.storage import FileSystemStorage
 
 
 def upload_dynamic_path(instance, filename):
+    root_dir = instance.get_root_dir(instance)
+    repository = root_dir.root_repository
+
     return '{0}/{1}/{2}'.format(
-        instance.repository.owner,
-        instance.repository.name,
+        repository.owner,
+        repository.name,
         filename,
     )
 

@@ -1,3 +1,4 @@
+import hashlib
 import os
 import random
 
@@ -80,6 +81,7 @@ class TestRepositoryModel:
 
 
 class TestManagedFileModel:
+
     def _create_stub_user_and_repository(self):
         self.user = User.objects.create_user(
             user_id='user',
@@ -95,7 +97,8 @@ class TestManagedFileModel:
         self._create_stub_user_and_repository()
         myfile = ContentFile(random.choice('abcde'))
         obj = ManagedFile(
-            repository=self.repo,
+            name='file_name',
+            dir=self.repo.root_folder,
         )
         obj.file.save('file_name', myfile)
         assert '/user/repo/file_name' in obj.file.path
@@ -104,7 +107,27 @@ class TestManagedFileModel:
         self._create_stub_user_and_repository()
         myfile = ContentFile(random.choice('abcde'))
         obj = ManagedFile(
-            repository=self.repo,
+            name='file_name',
+            dir = self.repo.root_folder,
         )
         obj.file.save('file_name', myfile)
         assert TrackedFileInfo.objects.count() == 1
+
+    def test_dir_has_full_dir_path(self):
+        self._create_stub_user_and_repository()
+        myfolder = ManagedFile.objects.create(
+            name='child_folder',
+            dir=self.repo.root_folder
+        )
+
+        assert myfolder.get_parent_dir(myfolder.dir) + myfolder.name == '/child_folder'
+
+    def test_has_a_hash_value_for_the_file_name(self):
+        self._create_stub_user_and_repository()
+        myfile = ContentFile(random.choice('abcde'))
+        obj = ManagedFile(
+            name='file_name',
+            dir=self.repo.root_folder,
+        )
+        obj.file.save('file_name', myfile)
+        assert obj.file_hash == hashlib.sha1(str.encode('/file_name')).hexdigest()
