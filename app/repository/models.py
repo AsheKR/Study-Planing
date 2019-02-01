@@ -7,6 +7,7 @@ from django.db import models
 from django.utils import timezone
 
 from repository.filesystems import upload_dynamic_path, ManagedFileSystemStorage
+from repository.tests.vcs_mixin import VCSMixin
 
 
 class Repository(models.Model):
@@ -41,7 +42,7 @@ class Repository(models.Model):
         )
         self.root_folder = root_folder
         super().save()
-        pathlib.Path(os.path.join(self.get_repository_dir, '.vcs')).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(os.path.join(self.get_repository_dir, '.vcs', 'patch')).mkdir(parents=True, exist_ok=True)
 
 
 class ManagedFile(models.Model):
@@ -118,7 +119,7 @@ class TrackedFileInfo(models.Model):
     )
 
 
-class Commit(models.Model):
+class Commit(models.Model, VCSMixin):
     tracked_file = models.ForeignKey(
         TrackedFileInfo,
         on_delete=models.CASCADE,
@@ -139,39 +140,8 @@ class Commit(models.Model):
     )
     created_at = models.DateTimeField()
 
-    @staticmethod
-    def file_hash(file):
-        BLOCKSIZE = 65536
-        hasher = hashlib.sha1()
-        with file.open('rb') as afile:
-            buf = afile.read(BLOCKSIZE)
-            while len(buf) > 0:
-                hasher.update(str(buf).encode('utf-8'))
-                buf = afile.read(BLOCKSIZE)
-        return hasher.hexdigest()
-
-    @staticmethod
-    def commit(*args, tracked_file, new_file, **kwargs):
-        file_content_hash = Commit.file_hash(new_file)
-
-        if not tracked_file.head:
-            # 기존 커밋이 없다면 head를 삽입
-            tracked_file.head = file_content_hash
-            tracked_file.save()
-        elif tracked_file.head == file_content_hash:
-            # 기존 커밋과 비교하고 같으면 실패
-            raise ValueError('바뀐 내용이 없습니다.')
-        elif tracked_file.head != file_content_hash:
-            # 기존 커밋과 비교하여 다르면 head 삽입
-            tracked_file.head = file_content_hash
-            tracked_file.save()
-
-        kwargs['tracked_file'] = tracked_file
-        Commit(*args, **kwargs).save()
-
     def save(self, *args, **kwargs):
-        now = timezone.now()
-        full_str = self.tracked_file.managed_file.name + str(now)
-        self.commit_hash = hashlib.sha1(str.encode(full_str)).hexdigest()
+        now = self.created_at if self.created_at else timezone.now()
         self.created_at = now
+        self.commit_hash = Commit.calc_commit_hash(self.tracked_file, now)
         super().save(*args, **kwargs)

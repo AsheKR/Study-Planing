@@ -205,7 +205,25 @@ class TestCommitModel:
             content='',
         )
 
-        print(TrackedFileInfo.objects.get(managed_file=self.managed_file).head)
         assert TrackedFileInfo.objects.get(managed_file=self.managed_file).head
 
-    # def test_second_commit_create_patch_file(self):
+    def test_second_commit_create_patch_file(self):
+        self._create_stub_user_and_repository_and_file()
+
+        new_file = ContentFile(random.choice('bcde'))
+        Commit.commit(
+            new_file=new_file,
+            tracked_file=self.managed_file.trackedfileinfo,
+            author=self.user,
+            title='second_commit',
+            content='',
+        )
+
+        assert os.path.exists(
+            os.path.join(
+                self.managed_file.get_root_dir(self.managed_file).root_repository.get_repository_dir,
+                '.vcs',
+                'patch',
+                self.managed_file.trackedfileinfo.commit_set.last().commit_hash
+            )
+        )
