@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, models
 
-from repository.models import Repository, ManagedFile, TrackedFileInfo
+from repository.models import Repository, ManagedFile, TrackedFileInfo, Commit
 
 User = get_user_model()
 
@@ -170,3 +170,42 @@ class TestTrackedFileInfoModel:
             dir=self.repo.root_folder,
         )
         self.file.file.save('file_name', file)
+
+
+class TestCommitModel:
+
+    def _create_stub_user_and_repository_and_file(self):
+        self.user = User.objects.create_user(
+            user_id='user',
+            password='123',
+            email='a@a.com'
+        )
+        self.repo = Repository.objects.create(
+            name='repo',
+            owner=self.user
+        )
+        file = ContentFile(random.choice('abcde'))
+        self.managed_file = ManagedFile(
+            create_author=self.user,
+            name='file_name',
+            dir=self.repo.root_folder,
+        )
+        self.managed_file.file.save('file_name', file)
+
+    def test_second_commit_create_tracked_file_head(self):
+        self._create_stub_user_and_repository_and_file()
+        assert not TrackedFileInfo.objects.get(managed_file=self.managed_file).head
+
+        new_file = ContentFile(random.choice('bcde'))
+        Commit.commit(
+            new_file=new_file,
+            tracked_file=self.managed_file.trackedfileinfo,
+            author=self.user,
+            title='second_commit',
+            content='',
+        )
+
+        print(TrackedFileInfo.objects.get(managed_file=self.managed_file).head)
+        assert TrackedFileInfo.objects.get(managed_file=self.managed_file).head
+
+    # def test_second_commit_create_patch_file(self):

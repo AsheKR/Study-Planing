@@ -139,6 +139,36 @@ class Commit(models.Model):
     )
     created_at = models.DateTimeField()
 
+    @staticmethod
+    def file_hash(file):
+        BLOCKSIZE = 65536
+        hasher = hashlib.sha1()
+        with file.open('rb') as afile:
+            buf = afile.read(BLOCKSIZE)
+            while len(buf) > 0:
+                hasher.update(str(buf).encode('utf-8'))
+                buf = afile.read(BLOCKSIZE)
+        return hasher.hexdigest()
+
+    @staticmethod
+    def commit(*args, tracked_file, new_file, **kwargs):
+        file_content_hash = Commit.file_hash(new_file)
+
+        if not tracked_file.head:
+            # 기존 커밋이 없다면 head를 삽입
+            tracked_file.head = file_content_hash
+            tracked_file.save()
+        elif tracked_file.head == file_content_hash:
+            # 기존 커밋과 비교하고 같으면 실패
+            raise ValueError('바뀐 내용이 없습니다.')
+        elif tracked_file.head != file_content_hash:
+            # 기존 커밋과 비교하여 다르면 head 삽입
+            tracked_file.head = file_content_hash
+            tracked_file.save()
+
+        kwargs['tracked_file'] = tracked_file
+        Commit(*args, **kwargs).save()
+
     def save(self, *args, **kwargs):
         now = timezone.now()
         full_str = self.tracked_file.managed_file.name + str(now)
