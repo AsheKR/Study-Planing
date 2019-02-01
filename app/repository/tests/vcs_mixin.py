@@ -13,10 +13,6 @@ class VCSMixin:
         full_str = tracked_file.managed_file.name + str(now)
         return hashlib.sha1(str.encode(full_str)).hexdigest()
 
-    @staticmethod
-    def datetime_to_committed_time(datetime):
-        return datetime.strftime('%Y-%m-%d_%H:%M-%S')
-
     @classmethod
     def commit(cls, *args, tracked_file, new_file, **kwargs):
         def file_hash(file):
