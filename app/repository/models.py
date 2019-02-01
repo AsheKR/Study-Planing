@@ -8,7 +8,7 @@ from django.db import models
 from django.utils import timezone
 
 from repository.filesystems import upload_dynamic_path, ManagedFileSystemStorage
-from repository.tests.vcs_mixin import VCSMixin
+from repository.vcs_mixin import VCSMixin
 
 
 class Repository(models.Model):
@@ -34,6 +34,9 @@ class Repository(models.Model):
 
     @property
     def get_repository_dir(self):
+        """
+        Repository의 Root Directory의 문자열을 리턴하는 프로퍼티
+        """
         return os.path.join(settings.ROOT_DIR, '.media', self.owner.user_id, self.name)
 
     def save(self, *args, **kwargs):
@@ -74,12 +77,18 @@ class ManagedFile(models.Model):
         return self.name
 
     def get_root_dir(self, parent_dir):
+        """
+        해당 레포지토리의 Root ('/') 의 ManagedFile Object를 가져오는 함수
+        """
         if not parent_dir.dir:
             return parent_dir
 
         return self.get_root_dir(parent_dir.dir)
 
     def get_parent_dir(self, parent_dir):
+        """
+        해당 레포지토리의 루트로부터 현재 파일 혹은 폴더의 부모 폴더까지의 경로를 가져오는 함수
+        """
         if not parent_dir.dir:
             return ''
 
