@@ -15,6 +15,11 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
+# CORS ALLOW WHITELIST
+CORS_ORIGIN_WHITELIST = (
+    # 추후에 추가될 Front 도메인
+)
+
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
