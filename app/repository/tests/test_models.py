@@ -192,9 +192,9 @@ class TestCommitModel:
         )
         self.managed_file.file.save('file_name', file)
 
-    def test_second_commit_create_tracked_file_head(self):
+    def test_commit_create_tracked_file_head(self):
         self._create_stub_user_and_repository_and_file()
-        assert not TrackedFileInfo.objects.get(managed_file=self.managed_file).head
+        init_commit = TrackedFileInfo.objects.get(managed_file=self.managed_file).head
 
         new_file = ContentFile(random.choice('bcde'))
         Commit.commit(
@@ -205,7 +205,20 @@ class TestCommitModel:
             content='',
         )
 
-        assert TrackedFileInfo.objects.get(managed_file=self.managed_file).head
+        assert init_commit != TrackedFileInfo.objects.get(managed_file=self.managed_file).head
+
+    def test_content_no_changes_errors_occur(self):
+        self._create_stub_user_and_repository_and_file()
+
+        new_file = ContentFile('')
+        with pytest.raises(ValueError):
+            Commit.commit(
+                new_file=new_file,
+                tracked_file=self.managed_file.trackedfileinfo,
+                author=self.user,
+                title='second_commit',
+                content='',
+            )
 
     def test_second_commit_create_patch_file(self):
         self._create_stub_user_and_repository_and_file()

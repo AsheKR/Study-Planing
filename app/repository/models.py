@@ -3,6 +3,7 @@ import os
 import pathlib
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
 
@@ -101,10 +102,12 @@ class ManagedFile(models.Model):
             track = TrackedFileInfo.objects.create(
                 managed_file=self,
             )
-            Commit.objects.create(
+            new_file = ContentFile('')
+            Commit.commit(
+                new_file=new_file,
                 tracked_file=track,
                 author=self.create_author,
-                title=self.name+'생성됨.',
+                title=self.name + '생성됨.',
             )
 
 
