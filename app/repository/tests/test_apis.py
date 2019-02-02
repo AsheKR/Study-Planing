@@ -59,7 +59,7 @@ class TestRepositoryAPI(TestStubMethodMixin):
         }
         client.post(resolve_url('api:repository:repository_list_create'), data=context, **header)
 
-        response = client.get(resolve_url('api:repository:repository_list_create'), **header)
+        response = client.get(resolve_url('api:repository:repository_list_create'))
 
         assert response.status_code == 200
         assert len(response.data) == 2
