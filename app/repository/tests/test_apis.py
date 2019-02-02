@@ -1,7 +1,6 @@
 from django.shortcuts import resolve_url
 
-
-class TestRepositoryAPI:
+class TestStubMethodMixin:
 
     def _create_stub_members(self, client):
         context = {
@@ -24,6 +23,9 @@ class TestRepositoryAPI:
 
         response = client.post(resolve_url('api:repository:repository_create'), data=context, **header)
         return response, token
+
+
+class TestRepositoryAPI(TestStubMethodMixin):
 
     def test_create_repository_api(self, client):
         response, _ = self._create_stub_repository(client)
