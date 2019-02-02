@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from rest_framework import generics, serializers
+from rest_framework import generics, serializers, status
 from rest_framework.response import Response
 
 from repository.apis.serializers import RepositorySerializer
@@ -40,3 +40,9 @@ class RepositoryRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestr
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        shutil.rmtree(instance.get_repository_dir)
+        return Response(status=status.HTTP_204_NO_CONTENT)
