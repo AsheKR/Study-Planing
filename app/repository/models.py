@@ -46,7 +46,8 @@ class Repository(models.Model):
         )
         self.root_folder = root_folder
         super().save()
-        pathlib.Path(os.path.join(self.get_repository_dir, '.vcs', 'patch')).mkdir(parents=True, exist_ok=True)
+        destination = os.path.join(self.get_repository_dir, '.vcs', 'patch')
+        pathlib.Path(destination).mkdir(parents=True, exist_ok=False)
 
 
 class ManagedFile(models.Model):
