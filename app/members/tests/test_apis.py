@@ -42,3 +42,13 @@ class TestUserAPI:
 
         assert response.status_code == 400, 'email이 중복되어 생성되면 안된다.'
         assert response.data.get('email')
+
+    def test_user_login_api(self, client):
+        self._create_stub_user(client)
+        context = self._get_stub_context
+        context.pop('email')
+
+        response = client.post(resolve_url('api:users:user_login'), context)
+
+        assert response.status_code == 200, '성공적으로 로그인되어야한다.'
+        assert response.json()['token'] == Token.objects.get(user=User.objects.first()).key
