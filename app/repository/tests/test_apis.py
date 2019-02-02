@@ -29,3 +29,18 @@ class TestRepositoryAPI:
         response, _ = self._create_stub_repository(client)
 
         assert response.status_code == 201
+
+    def test_cannot_create_repository_with_same_name(self, client):
+        _, token = self._create_stub_repository(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        context = {
+            'name': 'my-repo'
+        }
+
+        response = client.post(resolve_url('api:repository:repository_create'), data=context, **header)
+
+        assert response.status_code == 400
