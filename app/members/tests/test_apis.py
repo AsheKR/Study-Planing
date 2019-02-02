@@ -66,3 +66,10 @@ class TestUserAPI:
         assert response.json()['user_id']
         assert response.json()['email']
         assert not response.json().get('password')
+
+    def test_user_profile_api_user_not_found(self, client):
+        self._create_stub_user(client)
+
+        response = client.get(resolve_url('api:users:user_profile', pk=10))
+
+        assert response.status_code == 404
