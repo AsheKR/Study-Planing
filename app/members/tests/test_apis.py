@@ -20,6 +20,13 @@ class TestUserAPI:
         response = client.post(resolve_url('api:users:user_create'), context)
         return response
 
+    def _get_response_with_token(self, client):
+        context = self._get_stub_context
+        context.pop('email')
+
+        response = client.post(resolve_url('api:users:user_login'), context)
+        return response
+
     def test_create_member_api(self, client):
         response = self._create_stub_user(client)
 
@@ -45,10 +52,7 @@ class TestUserAPI:
 
     def test_user_login_api(self, client):
         self._create_stub_user(client)
-        context = self._get_stub_context
-        context.pop('email')
-
-        response = client.post(resolve_url('api:users:user_login'), context)
+        response = self._get_response_with_token(client)
 
         assert response.status_code == 200, '성공적으로 로그인되어야한다.'
         assert response.json()['token'] == Token.objects.get(user=User.objects.first()).key
