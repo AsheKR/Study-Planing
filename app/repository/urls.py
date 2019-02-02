@@ -5,5 +5,5 @@ from repository.apis import views
 app_name = 'repository'
 
 urlpatterns = [
-    path('', views.RepositoryListCreateGenericAPIView.as_view(), name='repository_create'),
+    path('', views.RepositoryListCreateGenericAPIView.as_view(), name='repository_list_create'),
 ]
