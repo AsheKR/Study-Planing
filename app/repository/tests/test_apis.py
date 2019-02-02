@@ -121,3 +121,16 @@ class TestRepositoryAPI(TestStubMethodMixin):
                                 content_type='application/json')
 
         assert response.status_code == 400
+
+    def test_destroy_repository_api(self, client):
+        _, token = self._create_stub_repository(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        response = client.delete(resolve_url('api:repository:repository_retrieve_update_destroy', pk=1),
+                                 **header,
+                                 content_type='application/json')
+
+        assert response.status_code == 204
