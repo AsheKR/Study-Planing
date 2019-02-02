@@ -1,5 +1,6 @@
 from django.shortcuts import resolve_url
 
+
 class TestStubMethodMixin:
 
     def _create_stub_members(self, client):
@@ -21,7 +22,7 @@ class TestStubMethodMixin:
             'name': 'my-repo'
         }
 
-        response = client.post(resolve_url('api:repository:repository_create'), data=context, **header)
+        response = client.post(resolve_url('api:repository:repository_list_create'), data=context, **header)
         return response, token
 
 
@@ -43,6 +44,22 @@ class TestRepositoryAPI(TestStubMethodMixin):
             'name': 'my-repo'
         }
 
-        response = client.post(resolve_url('api:repository:repository_create'), data=context, **header)
+        response = client.post(resolve_url('api:repository:repository_list_create'), data=context, **header)
 
         assert response.status_code == 400
+
+    def test_list_repository_api(self, client):
+        _, token = self._create_stub_repository(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+        context = {
+            'name': 'my-repo2'
+        }
+        client.post(resolve_url('api:repository:repository_list_create'), data=context, **header)
+
+        response = client.get(resolve_url('api:repository:repository_list_create'), **header)
+
+        assert response.status_code == 200
+        assert len(response.data) == 2
