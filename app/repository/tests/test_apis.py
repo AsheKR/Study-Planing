@@ -1,3 +1,4 @@
+import pytest
 from django.shortcuts import resolve_url
 
 from repository.models import Repository
@@ -78,3 +79,25 @@ class TestRepositoryAPI(TestStubMethodMixin):
         assert response.json().get('name')
         assert response.json().get('owner')
         assert response.json().get('root_folder')
+
+    def test_patch_repository_api(self, client):
+        _, token = self._create_stub_repository(client)
+
+        pk = Repository.objects.first().pk
+
+        change_name = 'change_dir_name'
+        context = {
+            'name': change_name
+        }
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        response = client.patch(resolve_url('api:repository:repository_retrieve_update_destroy', pk=pk),
+                                data=context,
+                                **header,
+                                content_type='application/json')
+
+        assert response.status_code == 200
+
+        assert Repository.objects.first().name == change_name
