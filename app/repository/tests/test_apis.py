@@ -101,3 +101,23 @@ class TestRepositoryAPI(TestStubMethodMixin):
         assert response.status_code == 200
 
         assert Repository.objects.first().name == change_name
+
+    def test_cannot_patch_repository_with_same_name(self, client):
+        _, token = self._create_stub_repository(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+        context = {
+            'name': 'my-repo2'
+        }
+        client.post(resolve_url('api:repository:repository_list_create'), data=context, **header)
+
+        client.get(resolve_url('api:repository:repository_list_create'))
+
+        response = client.patch(resolve_url('api:repository:repository_retrieve_update_destroy', pk=1),
+                                data=context,
+                                **header,
+                                content_type='application/json')
+
+        assert response.status_code == 400
