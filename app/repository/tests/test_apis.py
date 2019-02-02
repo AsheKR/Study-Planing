@@ -23,9 +23,9 @@ class TestRepositoryAPI:
         }
 
         response = client.post(resolve_url('api:repository:repository_create'), data=context, **header)
-        return response
+        return response, token
 
     def test_create_repository_api(self, client):
-        response = self._create_stub_repository(client)
+        response, _ = self._create_stub_repository(client)
 
         assert response.status_code == 201
