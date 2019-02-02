@@ -1,5 +1,7 @@
 from django.shortcuts import resolve_url
 
+from repository.models import Repository
+
 
 class TestStubMethodMixin:
 
@@ -63,3 +65,16 @@ class TestRepositoryAPI(TestStubMethodMixin):
 
         assert response.status_code == 200
         assert len(response.data) == 2
+
+    def test_retrieve_repository_api(self, client):
+        _, token = self._create_stub_repository(client)
+
+        pk = Repository.objects.first().pk
+
+        response = client.get(resolve_url('api:repository:repository_retrieve_update_destroy', pk=pk))
+
+        assert response.status_code == 200
+
+        assert response.json().get('name')
+        assert response.json().get('owner')
+        assert response.json().get('root_folder')
