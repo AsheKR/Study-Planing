@@ -7,24 +7,29 @@ User = get_user_model()
 
 class TestUserAPI:
 
-    def test_create_member_api(self, client):
-        context = {
+    @property
+    def _get_stub_context(self):
+        return {
             'user_id': 'example',
             'password': 'asd',
             'email': 'ex@ex.com',
         }
+
+    def _create_stub_user(self, client):
+        context = self._get_stub_context
         response = client.post(resolve_url('api:users:user_create'), context)
+        return response
+
+    def test_create_member_api(self, client):
+        response = self._create_stub_user(client)
 
         assert response.status_code == 201
         assert response.json()['token'] == Token.objects.get(user=User.objects.first()).key
 
     def test_error_occurs_when_duplication_the_id_or_email(self, client):
-        context = {
-            'user_id': 'example',
-            'password': 'asd',
-            'email': 'ex@ex.com',
-        }
-        client.post(resolve_url('api:users:user_create'), context)
+        context = self._get_stub_context
+        self._create_stub_user(client)
+
         context['email'] = 'ex2@ex.com'
         response = client.post(resolve_url('api:users:user_create'), context)
 
