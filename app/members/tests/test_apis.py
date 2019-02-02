@@ -56,3 +56,13 @@ class TestUserAPI:
 
         assert response.status_code == 200, '성공적으로 로그인되어야한다.'
         assert response.json()['token'] == Token.objects.get(user=User.objects.first()).key
+
+    def test_user_profile_api(self, client):
+        self._create_stub_user(client)
+
+        response = client.get(resolve_url('api:users:user_profile', pk=1))
+
+        assert response.status_code == 200, '성공적으로 프로필을 가져온다.'
+        assert response.json()['user_id']
+        assert response.json()['email']
+        assert not response.json().get('password')
