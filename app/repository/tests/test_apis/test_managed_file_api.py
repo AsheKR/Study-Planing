@@ -56,3 +56,25 @@ class TestManagedFileAPI(TestStubMethodMixin):
 
         assert response.status_code == 200
         assert response.json()['name'] == 'managed_file'
+
+    def test_patch_managed_file_api(self, client):
+        response, token = self._create_stub_managed_file(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        context = {
+            'name': 'change_file_name',
+        }
+
+        response = client.patch(
+            resolve_url('api:repository:managed_file_retrieve_update_destroy',
+                        repository_pk=1,
+                        dir_pk=1,
+                        pk=2),
+            data=context, **header,
+            content_type='application/json'
+        )
+
+        assert response.status_code == 200
