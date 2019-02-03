@@ -81,3 +81,18 @@ class ManagedFileRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDest
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.get_root_dir(instance) == instance:
+            raise serializers.ValidationError({'detail': '루트 디렉터리는 삭제할 수 없습니다.'})
+        if not instance.file:
+            shutil.rmtree(
+                os.path.join(
+                    instance.get_root_dir(instance).root_repository.get_repository_dir,
+                    instance.get_parent_dir(instance),
+                    instance.name,
+                )
+            )
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
