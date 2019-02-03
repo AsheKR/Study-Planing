@@ -8,9 +8,9 @@ file_patterns = ([
     path('file/',
          views.ManagedFileCreateGenericAPIView.as_view(),
          name='managed_file_create'),
-    path('<int:repository_pk>/directory/<int:dir_pk>/file/<int:file_pk>/',
+    path('file/<int:pk>/',
          views.ManagedFileRetrieveUpdateDestroyGenericAPIView.as_view(),
-         name='managed_file_create'),
+         name='managed_file_retrieve_update_destroy'),
 ])
 
 urlpatterns = [

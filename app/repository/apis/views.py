@@ -2,6 +2,7 @@ import os
 import shutil
 
 from rest_framework import generics, serializers, status
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from repository.apis.serializers import RepositorySerializer, ManagedFileSerializer
@@ -49,5 +50,10 @@ class RepositoryRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestr
 
 
 class ManagedFileCreateGenericAPIView(generics.CreateAPIView):
+    queryset = ManagedFile.objects.all()
+    serializer_class = ManagedFileSerializer
+
+
+class ManagedFileRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ManagedFile.objects.all()
     serializer_class = ManagedFileSerializer
