@@ -17,7 +17,6 @@ class TestManagedFileAPI(TestStubMethodMixin):
 
         assert response.status_code == 201
 
-    @pytest.mark.smoke
     def test_create_nested_file_with_managed_file_api(self, client):
         response, token = self._create_stub_folder_with_managed_file(client)
 
@@ -35,3 +34,21 @@ class TestManagedFileAPI(TestStubMethodMixin):
         response = client.post(resolve_url('api:repository:managed_file_list_create'), data=context, **header)
 
         assert response.status_code == 201
+
+    def test_cannot_create_same_name_in_same_directory(self, client):
+        response, token = self._create_stub_managed_file(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        context = {
+            'repository': '1',
+            'dir': '1',
+            'name': 'managed_file',
+            'file': ContentFile('Hello World!'),
+        }
+
+        response = client.post(resolve_url('api:repository:managed_file_list_create'), data=context, **header)
+
+        assert response.status_code == 400
