@@ -4,8 +4,8 @@ import shutil
 from rest_framework import generics, serializers, status
 from rest_framework.response import Response
 
-from repository.apis.serializers import RepositorySerializer
-from repository.models import Repository
+from repository.apis.serializers import RepositorySerializer, ManagedFileSerializer
+from repository.models import Repository, ManagedFile
 
 
 class RepositoryListCreateGenericAPIView(generics.ListCreateAPIView):
@@ -46,3 +46,8 @@ class RepositoryRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestr
         self.perform_destroy(instance)
         shutil.rmtree(instance.get_repository_dir)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ManagedFileListCreateGenericAPIView(generics.ListCreateAPIView):
+    queryset = ManagedFile.objects.all()
+    serializer_class = ManagedFileSerializer

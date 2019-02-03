@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from repository.models import Repository
+from repository.models import Repository, ManagedFile
 
 
 class RepositorySerializer(serializers.ModelSerializer):
@@ -27,4 +27,26 @@ class RepositorySerializer(serializers.ModelSerializer):
         return {
             'owner': self.context.get('request').user,
             **validated_data
+        }
+
+
+class ManagedFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ManagedFile
+        fields = '__all__'
+        read_only_fields = (
+            'create_author',
+            'file_hash',
+            'dir',
+        )
+
+    def to_internal_value(self, data):
+        validated_data = super().to_internal_value(data)
+        parent_dir = ManagedFile.objects.get(pk=data.get('dir'))
+
+        return {
+            'create_author': self.context.get('request').user,
+            'file': self.context.get('request').FILES,
+            'dir': parent_dir,
+            **validated_data,
         }

@@ -1,3 +1,4 @@
+from django.core.files.base import ContentFile
 from django.shortcuts import resolve_url
 
 
@@ -23,4 +24,21 @@ class TestStubMethodMixin:
         }
 
         response = client.post(resolve_url('api:repository:repository_list_create'), data=context, **header)
+        return response, token
+
+    def _create_stub_managed_file(self, client):
+        _, token = self._create_stub_repository(client)
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        context = {
+            'repository': '1',
+            'dir': '1',
+            'name': 'managed_file',
+            'file': ContentFile('Hello World!'),
+        }
+
+        response = client.post(resolve_url('api:repository:managed_file_list_create'), data=context, **header)
+
         return response, token
