@@ -1,8 +1,14 @@
+import shutil
+
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.shortcuts import resolve_url
 
 
 class TestStubMethodMixin:
+
+    def teardown_method(self, method):
+        shutil.rmtree(settings.MEDIA_ROOT)
 
     def _create_stub_members(self, client):
         context = {
