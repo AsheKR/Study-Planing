@@ -42,3 +42,19 @@ class TestStubMethodMixin:
         response = client.post(resolve_url('api:repository:managed_file_list_create'), data=context, **header)
 
         return response, token
+
+    def _create_stub_folder_with_managed_file(self, client):
+        _, token = self._create_stub_repository(client)
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        context = {
+            'repository': '1',
+            'dir': '1',
+            'name': 'managed_folder',
+        }
+
+        response = client.post(resolve_url('api:repository:managed_file_list_create'), data=context, **header)
+
+        return response, token
