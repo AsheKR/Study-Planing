@@ -49,7 +49,7 @@ class ManagedFileSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         validated_data = super().to_internal_value(data)
-        parent_dir = ManagedFile.objects.get(pk=data.get('dir'))
+        parent_dir = ManagedFile.objects.get(pk=self.context.get('request').parser_context['kwargs'].get('dir_pk'))
 
         return {
             'create_author': self.context.get('request').user,

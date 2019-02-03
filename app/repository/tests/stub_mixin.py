@@ -33,13 +33,11 @@ class TestStubMethodMixin:
         }
 
         context = {
-            'repository': '1',
-            'dir': '1',
             'name': 'managed_file',
             'file': ContentFile('Hello World!'),
         }
 
-        response = client.post(resolve_url('api:repository:managed_file_create'), data=context, **header)
+        response = client.post(resolve_url('api:repository:managed_file_create', repository_pk=1, dir_pk=1), data=context, **header)
 
         return response, token
 
@@ -50,11 +48,9 @@ class TestStubMethodMixin:
         }
 
         context = {
-            'repository': '1',
-            'dir': '1',
             'name': 'managed_folder',
         }
 
-        response = client.post(resolve_url('api:repository:managed_file_create'), data=context, **header)
+        response = client.post(resolve_url('api:repository:managed_file_create', repository_pk=1, dir_pk=1), data=context, **header)
 
         return response, token
