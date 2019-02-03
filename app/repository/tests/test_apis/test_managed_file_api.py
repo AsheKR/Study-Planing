@@ -100,3 +100,21 @@ class TestManagedFileAPI(TestStubMethodMixin):
         )
 
         assert response.status_code == 400
+
+    def test_destroy_managed_file_api(self, client):
+        _, token = self._create_stub_repository(client)
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        response = client.delete(
+            resolve_url('api:repository:managed_file_retrieve_update_destroy',
+                        repository_pk=1,
+                        dir_pk=1,
+                        pk=2),
+            **header,
+            content_type='application/json'
+        )
+
+        assert response.status_code == 204
