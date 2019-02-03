@@ -39,7 +39,7 @@ class TestStubMethodMixin:
             'file': ContentFile('Hello World!'),
         }
 
-        response = client.post(resolve_url('api:repository:managed_file_list_create'), data=context, **header)
+        response = client.post(resolve_url('api:repository:managed_file_create'), data=context, **header)
 
         return response, token
 
@@ -55,6 +55,6 @@ class TestStubMethodMixin:
             'name': 'managed_folder',
         }
 
-        response = client.post(resolve_url('api:repository:managed_file_list_create'), data=context, **header)
+        response = client.post(resolve_url('api:repository:managed_file_create'), data=context, **header)
 
         return response, token

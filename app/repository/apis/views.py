@@ -48,6 +48,6 @@ class RepositoryRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDestr
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ManagedFileListCreateGenericAPIView(generics.ListCreateAPIView):
+class ManagedFileCreateGenericAPIView(generics.CreateAPIView):
     queryset = ManagedFile.objects.all()
     serializer_class = ManagedFileSerializer

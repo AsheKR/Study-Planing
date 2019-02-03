@@ -31,7 +31,7 @@ class TestManagedFileAPI(TestStubMethodMixin):
             'file': ContentFile('Hello World!'),
         }
 
-        response = client.post(resolve_url('api:repository:managed_file_list_create'), data=context, **header)
+        response = client.post(resolve_url('api:repository:managed_file_create'), data=context, **header)
 
         assert response.status_code == 201
 
@@ -49,6 +49,6 @@ class TestManagedFileAPI(TestStubMethodMixin):
             'file': ContentFile('Hello World!'),
         }
 
-        response = client.post(resolve_url('api:repository:managed_file_list_create'), data=context, **header)
+        response = client.post(resolve_url('api:repository:managed_file_create'), data=context, **header)
 
         assert response.status_code == 400

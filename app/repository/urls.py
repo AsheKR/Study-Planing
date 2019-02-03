@@ -10,6 +10,6 @@ urlpatterns = [
          views.RepositoryRetrieveUpdateDestroyGenericAPIView.as_view(),
          name='repository_retrieve_update_destroy'),
     path('file/',
-         views.ManagedFileListCreateGenericAPIView.as_view(),
-         name='managed_file_list_create')
+         views.ManagedFileCreateGenericAPIView.as_view(),
+         name='managed_file_create')
 ]
