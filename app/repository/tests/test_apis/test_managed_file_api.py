@@ -48,3 +48,11 @@ class TestManagedFileAPI(TestStubMethodMixin):
         response = client.post(resolve_url('api:repository:managed_file_create', repository_pk=1, dir_pk=1), data=context, **header)
 
         assert response.status_code == 400
+
+    def test_retrieve_managed_file_api(self, client):
+        response, _ = self._create_stub_managed_file(client)
+
+        response = client.get(resolve_url('api:repository:managed_file_retrieve_update_destroy', repository_pk=1, dir_pk=1, pk=2))
+
+        assert response.status_code == 200
+        assert response.json()['name'] == 'managed_file'
