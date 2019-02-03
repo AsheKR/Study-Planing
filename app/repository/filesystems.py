@@ -12,7 +12,7 @@ def upload_dynamic_path(instance, filename):
         repository.owner,
         repository.name,
         parent_dir,
-        filename,
+        instance.name,
     )
 
     return value
