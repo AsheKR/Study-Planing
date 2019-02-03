@@ -40,6 +40,13 @@ class ManagedFileSerializer(serializers.ModelSerializer):
             'dir',
         )
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if ManagedFile.objects.filter(dir=attrs['dir'], name=attrs['name']).exists():
+            raise serializers.ValidationError({'detail': '이미 존재하는 파일이나 폴더가 있습니다.'})
+
+        return attrs
+
     def to_internal_value(self, data):
         validated_data = super().to_internal_value(data)
         parent_dir = ManagedFile.objects.get(pk=data.get('dir'))
