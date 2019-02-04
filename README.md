@@ -4,6 +4,10 @@
 ## 기능 마인드맵
 [MindMeister](https://www.mindmeister.com/1208278042?t=ZaUE9Qsx9R)
 
+## API
+
+[Swagger IO]()
+
 ## 핵심 라이브러리
 [Simple Text Version Control System](https://github.com/KapiteinRo/muq)
 
