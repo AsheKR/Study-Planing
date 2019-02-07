@@ -6,7 +6,6 @@ from repository.tests.stub_mixin import TestStubMethodMixin
 
 class TestCommitAPI(TestStubMethodMixin):
 
-    @pytest.mark.smoke
     def test_create_commit_api(self, client):
         response, _ = self._create_stub_commit_with_file(client)
 
