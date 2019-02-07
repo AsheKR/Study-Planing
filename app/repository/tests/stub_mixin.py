@@ -60,3 +60,24 @@ class TestStubMethodMixin:
         response = client.post(resolve_url('api:repository:managed_file_create', repository_pk=1, dir_pk=1), data=context, **header)
 
         return response, token
+
+    def _create_stub_commit_with_file(self, client):
+        _, token = self._create_stub_managed_file(client)
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        context = {
+            'file': ContentFile('Nice To Meet You!'),
+            'title': 'Hello to Nice',
+        }
+
+        response = client.post(
+            resolve_url(
+                'api:repository:commit_list_create',
+                repository_pk=1,
+                tracked_file_pk=1),
+            data=context,
+            **header)
+
+        return response, token

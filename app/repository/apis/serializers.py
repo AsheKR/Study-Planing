@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from repository.models import Repository, ManagedFile
+from repository.models import Repository, ManagedFile, Commit, TrackedFileInfo
 
 
 class RepositorySerializer(serializers.ModelSerializer):
@@ -57,3 +57,45 @@ class ManagedFileSerializer(serializers.ModelSerializer):
             'dir': parent_dir,
             **validated_data,
         }
+
+
+class CommitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Commit
+        fields = '__all__'
+        read_only_fields = (
+            'tracked_file',
+            'author',
+            'commit_hash',
+            'created_at',
+        )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+        try:
+            attrs['new_file'] = attrs.get('new_file').get('file')
+        except IndexError:
+            raise serializers.ValidationError({'detail': '파일이 전송되지 않았습니다.'})
+
+        return attrs
+
+    def to_internal_value(self, data):
+        validated_data = super().to_internal_value(data)
+        tracked_file_pk = self.context.get('request').parser_context['kwargs'].get('tracked_file_pk')
+
+        return {
+            'new_file': self.context.get('request').FILES,
+            'tracked_file': TrackedFileInfo.objects.get(pk=tracked_file_pk),
+            'author': self.context.get('request').user,
+            **validated_data,
+        }
+
+    def create(self, validated_data):
+        ModelClass = self.Meta.model
+
+        instance = ModelClass.commit(
+            **validated_data,
+        )
+
+        return instance

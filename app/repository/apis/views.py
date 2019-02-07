@@ -5,8 +5,8 @@ from rest_framework import generics, serializers, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from repository.apis.serializers import RepositorySerializer, ManagedFileSerializer
-from repository.models import Repository, ManagedFile
+from repository.apis.serializers import RepositorySerializer, ManagedFileSerializer, CommitSerializer
+from repository.models import Repository, ManagedFile, Commit
 
 
 class RepositoryListCreateGenericAPIView(generics.ListCreateAPIView):
@@ -96,3 +96,8 @@ class ManagedFileRetrieveUpdateDestroyGenericAPIView(generics.RetrieveUpdateDest
             )
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CommitListCreateGenericAPIView(generics.ListCreateAPIView):
+    queryset = Commit.objects.all()
+    serializer_class = CommitSerializer
