@@ -6,7 +6,7 @@
 
 ## API
 
-[Swagger IO]()
+[Swagger HUB]()
 
 ## 핵심 라이브러리
 [Simple Text Version Control System](https://github.com/KapiteinRo/muq)
