@@ -1,3 +1,4 @@
+import pytest
 from django.shortcuts import resolve_url
 
 from repository.models import Repository
@@ -109,3 +110,23 @@ class TestRepositoryAPI(TestStubMethodMixin):
                                  content_type='application/json')
 
         assert response.status_code == 204
+
+    def test_cannot_destroy_repository_another_owner(self, client):
+        _, _ = self._create_stub_repository(client)
+        context = {
+            'user_id': 'example1',
+            'password': 'asd',
+            'email': 'ex1@ex.com',
+        }
+        response = client.post(resolve_url('api:users:user_create'), context)
+        token = response.json()['token']
+
+        header = {
+            'HTTP_AUTHORIZATION': 'Token ' + token,
+        }
+
+        response = client.delete(resolve_url('api:repository:repository_retrieve_update_destroy', pk=1),
+                                 **header,
+                                 content_type='application/json')
+
+        assert response.status_code == 403
