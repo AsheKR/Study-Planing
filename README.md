@@ -1,6 +1,11 @@
 # Study-Planing
 공부기록 사이트
 
+## 중지
+
+[문제] 공유되는 드라이브가 있어야함.
+[해결책] 이를 EFS로 해결하고자한다. 도커를 올리고, EFS를 마운트 하면 OS나 pathlib같은 동작들도 제대로 동작하지 않을까 싶다.
+
 ## 기능 마인드맵
 [MindMeister](https://www.mindmeister.com/1208278042?t=ZaUE9Qsx9R)
 
